@@ -12,6 +12,8 @@ public class RegisterRequest {
     private String email;
     private Long mobileNum;
     private String password;
+    
+    
 	public String getUsername() {
 		return username;
 	}
