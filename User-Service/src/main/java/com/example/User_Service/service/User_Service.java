@@ -20,6 +20,9 @@ public class User_Service {
 	
 	public User login(LoginRequest loginRequest) {
 			User  user = userRepository.findByEmail(loginRequest.getEmail());
+			if(user == null) {
+				throw new RuntimeException("User not found");
+			}
 		if(!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
 			throw new RuntimeException("Invalid password");
 
@@ -29,6 +32,9 @@ public class User_Service {
 	}
 	
 	public User registrationUser(RegisterRequest registrationRequest) {
+		if (userRepository.existsByEmail(registrationRequest.getEmail())) {
+            throw new RuntimeException("User already exists with this email");
+        }
 		User user = new User();
 		user.setUsername(registrationRequest.getUsername());
 		user.setEmail(registrationRequest.getEmail());
