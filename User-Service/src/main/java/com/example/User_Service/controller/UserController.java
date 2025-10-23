@@ -1,6 +1,7 @@
 package com.example.User_Service.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,8 +26,9 @@ public class UserController {
 	
 	
 	@PostMapping("/register")
-	public UserResponse registrationUser(@RequestBody RegisterRequest registrationRequest) {
-		return userService.registrationUser(registrationRequest);
+	public ResponseEntity<UserResponse> registrationUser(@RequestBody RegisterRequest registrationRequest) {
+		UserResponse responce = userService.registrationUser(registrationRequest);
+		return ResponseEntity.status(HttpStatus.CREATED).body(responce);
 	}
 
 }
