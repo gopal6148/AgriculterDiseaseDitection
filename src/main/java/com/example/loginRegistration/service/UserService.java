@@ -3,6 +3,7 @@ package com.example.loginRegistration.service;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.loginRegistration.dto.Registration;
@@ -16,6 +17,10 @@ public class UserService {
 	@Autowired
 	private UserRepo userRepo;
 	
+	@Autowired
+    private PasswordEncoder passwordEncoder;
+
+	
 	public String saveUser(Registration regist) {
 		if(userRepo.existsByEmail(regist.getEmail())) {
 			return "Email already exists";
@@ -28,7 +33,7 @@ public class UserService {
 		user.setFname(regist.getFname());
 		user.setEmail(regist.getEmail());
 		user.setMobileNum(regist.getMobileNum());
-		user.setPassword(regist.getPassword());
+		user.setPassword(passwordEncoder.encode(regist.getPassword()));
 		user.setRole(Role.USER);
 		user.setLocalDateTime(LocalDateTime.now());
 		userRepo.save(user);
