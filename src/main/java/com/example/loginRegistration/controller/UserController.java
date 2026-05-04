@@ -1,6 +1,7 @@
 package com.example.loginRegistration.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,16 +26,20 @@ public class UserController {
 	private JWTUtil jwtUtil;
 	
 	@Autowired
-	AuthenticationManager authentication;
+	private AuthenticationManager authentication;
 	
 	@PostMapping("/register")
-	public String saveUser(@RequestBody Registration registration) {
-		return userService.saveUser(registration);
+	public ResponseEntity<String> saveUser(@RequestBody Registration registration) {
+		 userService.saveUser(registration);
+		 return ResponseEntity.ok("User register succefully");
 	}
 	
 	@PostMapping("/login")
 	public String login(@RequestBody Login login) {
-		return userService.login(login);
+		authentication.authenticate(
+				new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword())
+				);
+		return jwtUtil.genretedToken(login.getEmail());
 	}
 	
 	@PostMapping("/login2")

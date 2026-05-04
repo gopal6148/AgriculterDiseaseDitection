@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetailsService;  
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,9 @@ import com.example.loginRegistration.dto.Login;
 import com.example.loginRegistration.dto.Registration;
 import com.example.loginRegistration.enm.Role;
 import com.example.loginRegistration.entity.User;
+import com.example.loginRegistration.exceptionHandling.MobileNumberAllreadyExist;
+import com.example.loginRegistration.exceptionHandling.PasswordNotFound;
+import com.example.loginRegistration.exceptionHandling.UserAllRedyRegister;
 import com.example.loginRegistration.repository.UserRepo;
 
 @Service
@@ -29,10 +32,10 @@ public class UserService implements UserDetailsService{
 	
 	public String saveUser(Registration regist) {
 		if(userRepo.existsByEmail(regist.getEmail())) {
-			return "Email already exists";
+			throw new UserAllRedyRegister("user all ready exist");
 		}
 		if(userRepo.existsByMobileNum(regist.getMobileNum())) {
-			return "mobile number alredy exists";
+			throw new MobileNumberAllreadyExist("mobile number all ready exist");
 		}
 		
 		User user = new User();
@@ -59,7 +62,10 @@ public class UserService implements UserDetailsService{
 				.orElseThrow(()-> new RuntimeException("invalid email"));
 		
 		if(!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
-			return "Invalid password";
+			throw new PasswordNotFound("invalid password");
+		}
+		if(!login.getRole().toUpperCase().equals(user.getRole())) {
+			return "this is not your role";
 		}
 		return "login successfully";
 	}
