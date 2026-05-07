@@ -51,7 +51,7 @@ public class UserController {
 		return jwtUtil.genretedToken(login.getEmail());
 	}
 	
-	@GetMapping("/massage")
+	@GetMapping("/message")
 	public String getAll() {
 		return "Hello";
 	}

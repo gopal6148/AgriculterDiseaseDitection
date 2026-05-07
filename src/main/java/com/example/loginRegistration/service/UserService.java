@@ -2,7 +2,6 @@ package com.example.loginRegistration.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,7 +31,7 @@ public class UserService implements UserDetailsService{
 	
 	public String saveUser(Registration regist) {
 		if(userRepo.existsByEmail(regist.getEmail())) {
-			throw new UserAllRedyRegister("user all ready exist");
+			throw new UserAllRedyRegister("email all ready exist");
 		}
 		if(userRepo.existsByMobileNum(regist.getMobileNum())) {
 			throw new MobileNumberAllreadyExist("mobile number all ready exist");
@@ -64,9 +63,7 @@ public class UserService implements UserDetailsService{
 		if(!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
 			throw new PasswordNotFound("invalid password");
 		}
-		if(!login.getRole().toUpperCase().equals(user.getRole())) {
-			return "this is not your role";
-		}
+		
 		return "login successfully";
 	}
 
@@ -81,5 +78,18 @@ public class UserService implements UserDetailsService{
 	                List.of(new SimpleGrantedAuthority(user.getRole().name()))
 	        );
 	    }
+	 
+	 public String deleteUser(long id) {
+		userRepo.deleteById(id);
+		return "delete succefully";
+	 }
+	 
+	 public List<User> getAllUser() {
+		 List<User> users = userRepo.findAll();
+
+		    return users.stream()
+		            .filter(user -> user.getRole().equals(Role.USER))
+		            .toList();
+	 }
 
 }
