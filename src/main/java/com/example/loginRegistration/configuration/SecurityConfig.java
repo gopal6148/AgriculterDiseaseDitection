@@ -13,6 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.example.loginRegistration.enm.Role;
 import com.example.loginRegistration.filter.JWTAuthFilter;
 
 
@@ -30,7 +32,7 @@ public class SecurityConfig {
          )
 		.authorizeHttpRequests(auth -> auth
 			.requestMatchers("/auth/**").permitAll()
-			.requestMatchers("/admin/**").hasRole("ADMIN")
+			.requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
 			.anyRequest().authenticated()
 			);
 		http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
