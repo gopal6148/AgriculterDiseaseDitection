@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.loginRegistration.dto.Login;
 import com.example.loginRegistration.dto.Registration;
+import com.example.loginRegistration.dto.UserResponce;
 import com.example.loginRegistration.entity.User;
 import com.example.loginRegistration.service.UserService;
 import com.example.loginRegistration.util.JWTUtil;
@@ -54,7 +55,7 @@ public class UserController {
 	}
 	
     @GetMapping("/user")
-	public List<User> getAllUser() {
+	public List<UserResponce> getAllUser() {
 		return userService.getAllUser();
 	}
 	

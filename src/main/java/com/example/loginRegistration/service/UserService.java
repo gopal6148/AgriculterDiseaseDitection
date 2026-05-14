@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.loginRegistration.dto.Login;
 import com.example.loginRegistration.dto.Registration;
+import com.example.loginRegistration.dto.UserResponce;
 import com.example.loginRegistration.enm.Role;
 import com.example.loginRegistration.entity.User;
 import com.example.loginRegistration.exceptionHandling.MobileNumberAllreadyExist;
@@ -84,10 +85,17 @@ public class UserService implements UserDetailsService{
 		return "delete succefully";
 	 }
 	 
-	 public List<User> getAllUser() {
+	 public List<UserResponce> getAllUser() {
 		 List<User> users = userRepo.findAll();
 
 		    return users.stream()
+		    		.map(user -> new UserResponce(
+		    				user.getId(), 
+		    				user.getFname(), 
+		    				user.getEmail(),
+		    				user.getMobileNum(), 
+		    				user.getRole(), 
+		    				user.getLocalDateTime()))
 		            .filter(user -> user.getRole().equals(Role.USER))
 		            .toList();
 	 }
