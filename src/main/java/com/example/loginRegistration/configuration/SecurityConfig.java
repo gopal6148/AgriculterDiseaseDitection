@@ -21,8 +21,6 @@ import com.example.loginRegistration.filter.JWTAuthFilter;
 
 
 @Configuration
-@EnableWebSecurity
-@EnableMethodSecurity
 public class SecurityConfig {
 	
 	@Autowired
@@ -36,7 +34,6 @@ public class SecurityConfig {
          )
 		.authorizeHttpRequests(auth -> auth
 			.requestMatchers("/auth/**").permitAll()
-			.requestMatchers("/admin/**").hasRole("Admin")
 			.anyRequest().authenticated()
 			);
 		http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

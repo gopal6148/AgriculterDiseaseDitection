@@ -49,7 +49,7 @@ public class UserService implements UserDetailsService{
 		return "user register successfully";
 	}
 	
-	public String login(Login login) {
+	/**public String login(Login login) {
 		if(login.getEmail() == null || login.getEmail().isEmpty()) {
 			throw new IllegalArgumentException("email is not empty");
 		}
@@ -65,7 +65,7 @@ public class UserService implements UserDetailsService{
 		}
 		
 		return "login successfully";
-	}
+	}**/
 
 	 @Override
 	    public UserDetails loadUserByUsername(String email) {

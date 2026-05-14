@@ -122,24 +122,46 @@ public class User implements UserDetails{
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
-		Set<SimpleGrantedAuthority> authority = new HashSet<>();
+		/**Set<SimpleGrantedAuthority> authority = new HashSet<>();
 		authority.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
 		
 		Set<SimpleGrantedAuthority> permiss = role.getPermission().stream()
 		.map(permission -> new SimpleGrantedAuthority(permission.name()))
 		.collect(Collectors.toSet());
 		
-		authority.addAll(permiss);
+		authority.addAll(permiss);**/
 		
-		return authority;
+		return List.of(new SimpleGrantedAuthority(role.name()));
 	}
 
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.email;
+	
 	}
 	
-	
+	@Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    // Account Lock
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    // Password Expiry
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+    
+    // Account Active
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 
 }
