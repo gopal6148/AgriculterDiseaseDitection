@@ -3,19 +3,17 @@ package com.example.loginRegistration.enm;
 import java.util.Set;
 
 public enum Role {
-	USER,//(Set.of(Permission.USER_READ, Permission.USER_REGESTER, Permission.USER_DELETE, 
-			//Permission.USER_UPDATE)),
-	ADMIN; //(Set.of(Permission.USER_REGESTER, Permission.USER_READ));
-	
+    USER(Set.of(Permission.USER_READ, Permission.USER_REGESTER)),
+    ADMIN(Set.of(Permission.USER_READ, Permission.USER_REGESTER, Permission.USER_DELETE, Permission.USER_UPDATE));
 
-	/**private final Set<Permission> permission;
-	
-	Role(Set<Permission> permission){
-		this.permission = permission;
-	}
-	
-	public Set<Permission> getPermission() {
-		return permission;
-	}**/
+    private final Set<Permission> permission;
+
+    Role(Set<Permission> permission){
+        this.permission = permission;
+    }
+
+    public Set<Permission> getPermission() {
+        return permission;
+    }
 
 }

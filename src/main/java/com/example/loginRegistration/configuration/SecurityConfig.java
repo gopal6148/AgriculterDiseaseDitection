@@ -22,6 +22,7 @@ import com.example.loginRegistration.filter.JWTAuthFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 	
 	@Autowired
@@ -34,9 +35,11 @@ public class SecurityConfig {
          session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
          )
 		.authorizeHttpRequests(auth -> auth
-			.requestMatchers("/auth/**").permitAll()
-			.anyRequest().authenticated()
-			);
+				.requestMatchers("/auth/login").permitAll()
+				.requestMatchers("/auth/register").permitAll()
+				.requestMatchers("/auth/user").hasRole("ADMIN")
+				.anyRequest().authenticated()
+				);
 		http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}

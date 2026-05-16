@@ -5,10 +5,7 @@ package com.example.loginRegistration.entity;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -121,17 +118,15 @@ public class User implements UserDetails{
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		/**Set<SimpleGrantedAuthority> authority = new HashSet<>();
-		authority.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
-		
-		Set<SimpleGrantedAuthority> permiss = role.getPermission().stream()
-		.map(permission -> new SimpleGrantedAuthority(permission.name()))
-		.collect(Collectors.toSet());
-		
-		authority.addAll(permiss);**/
-		
-		return List.of(new SimpleGrantedAuthority(role.name()));
+		// Return role authority (ROLE_...) and permission authorities (e.g., USER_READ)
+		Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+		authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
+		if (role.getPermission() != null) {
+			role.getPermission().stream()
+				.map(permission -> new SimpleGrantedAuthority(permission.name()))
+				.forEach(authorities::add);
+		}
+		return authorities;
 	}
 
 	@Override
