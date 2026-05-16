@@ -2,8 +2,17 @@ package com.example.loginRegistration.exceptionHandling;
 
 public class PasswordNotFound extends RuntimeException{
 	
-	public PasswordNotFound(String massage) {
-		super(massage);
+	private String msg;
+	
+	
+	public PasswordNotFound() {
+		super();
+	}
+
+
+	public PasswordNotFound(String message) {
+		super(message);
+		this.msg = message;
 	}
 
 }

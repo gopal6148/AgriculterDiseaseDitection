@@ -1,8 +1,17 @@
 package com.example.loginRegistration.exceptionHandling;
 
 public class MobileNumberAllreadyExist extends RuntimeException{
-	public MobileNumberAllreadyExist(String massage) {
-		super(massage);
+	
+	private String msg;
+	
+	
+	public MobileNumberAllreadyExist() {
+	}
+
+
+	public MobileNumberAllreadyExist(String message) {
+		super(message);
+		this.msg = message;
 	}
 
 }

@@ -2,8 +2,13 @@ package com.example.loginRegistration.exceptionHandling;
 
 public class UsernameNotFound extends RuntimeException{
 	
-	public UsernameNotFound(String massage){
-		super(massage);
+	private String msg;
+	
+	public UsernameNotFound() {};
+	
+	public UsernameNotFound(String message){
+		super(message);
+		this.msg = message;
 	}
 
 }

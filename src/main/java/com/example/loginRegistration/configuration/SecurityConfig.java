@@ -21,6 +21,7 @@ import com.example.loginRegistration.filter.JWTAuthFilter;
 
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 	
 	@Autowired
