@@ -3,7 +3,9 @@ package com.example.loginRegistration.util;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
+import jakarta.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +16,17 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JWTUtil {
-	private final String secret = "aVeryLongSecretKeyForJwtAuthenticationThatIsAtLeast256BitsLong123456\r\n";
-	private final SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
-	private final long ExpirationTime = 1000*60*60 ;// 1 hour
+	@Value("${jwt.secret:defaultVeryLongSecretKeyReplaceInProd}")
+	private String secret;
+
+	private SecretKey key;
+	private final long ExpirationTime = 1000 * 60 * 60; // 1 hour
+
+	@PostConstruct
+	public void init() {
+		// initialize the signing key after secret is injected
+		this.key = Keys.hmacShaKeyFor(secret.getBytes());
+	}
 	
 	public String genretedToken(String username) {
 		return Jwts.builder()

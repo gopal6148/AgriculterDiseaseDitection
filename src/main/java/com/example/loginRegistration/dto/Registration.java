@@ -25,7 +25,7 @@ public class Registration {
 	private String mobileNum;
 	
 	@NotBlank(message = "Password cannot be empty")
-    @Size(min = 8, message = "Password must be at least 8 characters")
+   // @Size(min = 8, message = "Password must be at least 8 characters")
 	private String password;
 
 	public String getFname() {

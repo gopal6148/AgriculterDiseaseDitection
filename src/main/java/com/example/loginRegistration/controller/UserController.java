@@ -11,14 +11,16 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.loginRegistration.dto.Login;
+import com.example.loginRegistration.dto.OtpRequest;
+import com.example.loginRegistration.dto.EmailRequest;
 import com.example.loginRegistration.dto.Registration;
 import com.example.loginRegistration.dto.UserResponce;
-import com.example.loginRegistration.entity.User;
 import com.example.loginRegistration.service.UserService;
 import com.example.loginRegistration.util.JWTUtil;
 
@@ -37,13 +39,23 @@ public class UserController {
 	private AuthenticationManager authentication;
 	
 	@PostMapping("/register")
-	public ResponseEntity<String> saveUser(@RequestBody Registration registration) {
+	public ResponseEntity<String> saveUser(@Valid @RequestBody Registration registration) {
 		 userService.saveUser(registration);
 		 return ResponseEntity.ok("User register succefully");
 	}
 	
+	 @PostMapping("/verify")
+	public ResponseEntity<?> verify(@Valid @RequestBody OtpRequest req) {
+		return ResponseEntity.ok(userService.verifyOtp(req));
+	}
+
+		@PostMapping("/resend")
+		public ResponseEntity<String> resendOtp(@Valid @RequestBody EmailRequest req) {
+			return ResponseEntity.ok(userService.resendOtp(req.getEmail()));
+		}
+	
 	@PostMapping("/login")
-	public String login(@RequestBody Login login) {
+	public String login(@Valid @RequestBody Login login) {
 		authentication.authenticate(
 				new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword())
 				);

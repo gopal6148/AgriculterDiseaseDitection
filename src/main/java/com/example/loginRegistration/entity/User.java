@@ -51,13 +51,19 @@ public class User implements UserDetails{
 	private String mobileNum;
 	
 	@NotBlank(message = "password is not blank")
-	@Size(min = 8, message = "Password must be at least 8 characters")
+	//@Size(min = 8, message = "Password must be at least 8 characters")
 	@Column(nullable = false)
 	private String password;
 	
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Role role;
+	
+	private boolean isOtpVerified = false;
+	
+	private String otp;
+	
+	private LocalDateTime otpExpriresAt;
 	
 	private LocalDateTime localDateTime;
 
@@ -114,6 +120,32 @@ public class User implements UserDetails{
 	}
 	public void setLocalDateTime(LocalDateTime localDateTime) {
 		this.localDateTime = localDateTime;
+	}
+	
+	
+
+	public boolean isOtpVerified() {
+		return isOtpVerified;
+	}
+
+	public void setOtpVerified(boolean isOtpVerified) {
+		this.isOtpVerified = isOtpVerified;
+	}
+
+	public String getOtp() {
+		return otp;
+	}
+
+	public void setOtp(String otp) {
+		this.otp = otp;
+	}
+
+	public LocalDateTime getOtpExpriresAt() {
+		return otpExpriresAt;
+	}
+
+	public void setOtpExpriresAt(LocalDateTime otpExpriresAt) {
+		this.otpExpriresAt = otpExpriresAt;
 	}
 
 	@Override

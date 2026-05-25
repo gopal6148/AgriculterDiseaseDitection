@@ -51,9 +51,8 @@ public class SecurityConfig {
     }
 	@Bean
 	public AuthenticationManager authenticationManager(
-	        AuthenticationConfiguration config,
-	        @Qualifier("userService") UserDetailsService userDetailsService
-	) throws Exception {
-	    return config.getAuthenticationManager();
+			AuthenticationConfiguration config
+) throws Exception {
+		return config.getAuthenticationManager();
 	}
 }
