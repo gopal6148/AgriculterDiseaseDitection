@@ -36,7 +36,7 @@ public class UserController {
 	private JWTUtil jwtUtil;
 	
 	@Autowired
-	private AuthenticationManager authentication;
+	 private AuthenticationManager authentication;
 	
 	@PostMapping("/register")
 	public ResponseEntity<String> saveUser(@Valid @RequestBody Registration registration) {
