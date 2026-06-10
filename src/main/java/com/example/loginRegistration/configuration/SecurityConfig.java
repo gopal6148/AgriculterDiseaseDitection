@@ -24,35 +24,39 @@ import com.example.loginRegistration.filter.JWTAuthFilter;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-	
+
 	@Autowired
 	private JWTAuthFilter jwtAuthFilter;
-	
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable())
-		 .sessionManagement(session ->
-         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-         )
+		.sessionManagement(session ->
+		session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				)
 		.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/auth/login").permitAll()
 				.requestMatchers("/auth/register").permitAll()
+				.requestMatchers("/auth/request-password-reset").permitAll()
+				.requestMatchers("/auth/reset-password").permitAll()
+				.requestMatchers("/auth/resend").permitAll()
+				.requestMatchers("/auth/verify").permitAll()
 				.requestMatchers("/auth/user").hasRole("ADMIN")
 				.anyRequest().authenticated()
 				);
 		http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
-	
-	
+
+
 	@Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 	@Bean
 	public AuthenticationManager authenticationManager(
 			AuthenticationConfiguration config
-) throws Exception {
+			) throws Exception {
 		return config.getAuthenticationManager();
 	}
 }

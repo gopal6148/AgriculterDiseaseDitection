@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
-	
+
 	@Autowired
 	private JavaMailSender mailSender;
-	
+
 	public void sendOtp(String email, String otp) {
 		SimpleMailMessage smg = new SimpleMailMessage();
 		smg.setTo(email);

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.loginRegistration.dto.Login;
 import com.example.loginRegistration.dto.OtpRequest;
 import com.example.loginRegistration.dto.EmailRequest;
+import com.example.loginRegistration.dto.UpdateUserRequest;
+import com.example.loginRegistration.dto.ChangePasswordRequest;
+import com.example.loginRegistration.dto.ResetPasswordRequest;
 import com.example.loginRegistration.dto.Registration;
 import com.example.loginRegistration.dto.UserResponce;
 import com.example.loginRegistration.service.UserService;
@@ -39,18 +43,39 @@ public class UserController {
 	 private AuthenticationManager authentication;
 	
 	@PostMapping("/register")
-	public ResponseEntity<String> saveUser(@Valid @RequestBody Registration registration) {
+	public ResponseEntity<String> saveUser(@RequestBody Registration registration) {
 		 userService.saveUser(registration);
 		 return ResponseEntity.ok("User register succefully");
 	}
+
+	@PutMapping("update/{id}")
+	public ResponseEntity<UserResponce> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest req) {
+		UserResponce updated = userService.updateUser(id, req);
+		return ResponseEntity.ok(updated);
+	}
+
+	@PostMapping("/change-password")
+	public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest req) {
+		return ResponseEntity.ok(userService.changePassword(req));
+	}
+
+	@PostMapping("/request-password-reset")
+	public ResponseEntity<String> requestPasswordReset(@RequestBody EmailRequest req) {
+		return ResponseEntity.ok(userService.requestPasswordReset(req.getEmail()));
+	}
+
+	@PostMapping("/reset-password")
+	public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest req) {
+		return ResponseEntity.ok(userService.resetPasswordWithOtp(req));
+	}
 	
 	 @PostMapping("/verify")
-	public ResponseEntity<?> verify(@Valid @RequestBody OtpRequest req) {
+	public ResponseEntity<?> verify(@RequestBody OtpRequest req) {
 		return ResponseEntity.ok(userService.verifyOtp(req));
 	}
 
 		@PostMapping("/resend")
-		public ResponseEntity<String> resendOtp(@Valid @RequestBody EmailRequest req) {
+		public ResponseEntity<String> resendOtp(@RequestBody EmailRequest req) {
 			return ResponseEntity.ok(userService.resendOtp(req.getEmail()));
 		}
 	

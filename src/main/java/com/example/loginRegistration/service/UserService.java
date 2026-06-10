@@ -14,27 +14,29 @@ import org.springframework.stereotype.Service;
 
 import com.example.loginRegistration.dto.OtpRequest;
 import com.example.loginRegistration.dto.Registration;
+import com.example.loginRegistration.dto.UpdateUserRequest;
+import com.example.loginRegistration.dto.ChangePasswordRequest;
+import com.example.loginRegistration.dto.ResetPasswordRequest;
 import com.example.loginRegistration.dto.UserResponce;
 import com.example.loginRegistration.enm.Role;
 import com.example.loginRegistration.entity.User;
 import com.example.loginRegistration.exceptionHandling.MobileNumberAllreadyExist;
 import com.example.loginRegistration.exceptionHandling.UserAllRedyRegister;
 import com.example.loginRegistration.repository.UserRepo;
-import com.example.loginRegistration.exceptionHandling.UsernameNotFound;
 
 @Service
 public class UserService implements UserDetailsService{
-	
+
 	@Autowired
 	private UserRepo userRepo;
-	
+
 	@Autowired
-    private PasswordEncoder passwordEncoder;
-	
+	private PasswordEncoder passwordEncoder;
+
 	@Autowired
 	private EmailService emailService;
 
-	
+
 	public String saveUser(Registration regist) {
 		if(userRepo.existsByEmail(regist.getEmail())) {
 			throw new UserAllRedyRegister("email all ready exist");
@@ -42,7 +44,7 @@ public class UserService implements UserDetailsService{
 		if(userRepo.existsByMobileNum(regist.getMobileNum())) {
 			throw new MobileNumberAllreadyExist("mobile number all ready exist");
 		}
-		
+
 		User user = new User();
 		user.setFname(regist.getFname());
 		user.setEmail(regist.getEmail());
@@ -50,65 +52,64 @@ public class UserService implements UserDetailsService{
 		user.setPassword(passwordEncoder.encode(regist.getPassword()));
 		// Set default role to USER for newly registered users
 		user.setRole(Role.USER);
-		
+
 		String otp = generateOtp();
 		user.setOtp(otp);
 		user.setOtpExpriresAt(LocalDateTime.now().plusMinutes(5));
-		
+
 		user.setLocalDateTime(LocalDateTime.now());
 		userRepo.save(user);
-		
+
 		emailService.sendOtp(user.getEmail(), otp);
-		
+
 		return "send otp";
 	}
-	
+
 	private String generateOtp() {
-		
+
 		return String.valueOf(new Random().nextInt(900000) + 100000);
 	}
-	
-		public String verifyOtp(OtpRequest req) {
 
-			User user = userRepo.findByEmail(req.getEmail())
-					.orElseThrow(() -> new RuntimeException("User not found"));
+	public String verifyOtp(OtpRequest req) {
 
-						// Defensive null check in case validation isn't applied upstream
-						if (req.getOtp() == null) {
-							throw new RuntimeException("OTP is required");
-						}
+		User user = userRepo.findByEmail(req.getEmail())
+				.orElseThrow(() -> new RuntimeException("User not found"));
 
-			if (!req.getOtp().equals(user.getOtp())) {
-				throw new RuntimeException("Invalid OTP");
-			}
+		if (req.getOtp() == null) {
+			throw new RuntimeException("OTP is required");
+		}
 
-			if (user.getOtpExpriresAt().isBefore(LocalDateTime.now())) {
-				throw new RuntimeException("OTP expired");
-			}
+		if (!req.getOtp().equals(user.getOtp())) {
+			throw new RuntimeException("Invalid OTP");
+		}
 
-			user.setOtpVerified(true);
-			user.setOtp(null);
-			user.setOtpExpriresAt(null);
+		if (user.getOtpExpriresAt().isBefore(LocalDateTime.now())) {
+			throw new RuntimeException("OTP expired");
+		}
 
-			userRepo.save(user);
+		user.setOtpVerified(true);
+		user.setOtp(null);
+		user.setOtpExpriresAt(null);
 
-						return "Email Verified successfully";
-					}
+		userRepo.save(user);
 
-					public String resendOtp(String email) {
-						User user = userRepo.findByEmail(email)
-								.orElseThrow(() -> new RuntimeException("User not found"));
+		return "Email Verified successfully";
+	}
 
-						String otp = generateOtp();
-						user.setOtp(otp);
-						user.setOtpExpriresAt(LocalDateTime.now().plusMinutes(5));
+	public String resendOtp(String email) {
+		User user = userRepo.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("User not found"));
 
-						userRepo.save(user);
+		String otp = generateOtp();
+		user.setOtp(otp);
+		user.setOtpExpriresAt(LocalDateTime.now().plusMinutes(5));
 
-						emailService.sendOtp(user.getEmail(), otp);
+		userRepo.save(user);
 
-						return "OTP resent successfully";
-					}
+		emailService.sendOtp(user.getEmail(), otp);
+
+		return "OTP resent successfully";
+	}
 
 	/**public String login(Login login) {
 		if(login.getEmail() == null || login.getEmail().isEmpty()) {
@@ -117,49 +118,106 @@ public class UserService implements UserDetailsService{
 		if(login.getPassword() == null || login.getPassword().isEmpty()) {
 			throw new IllegalArgumentException("password is not empty");
 		}
-		
+
 		User user = userRepo.findByEmail(login.getEmail())
 				.orElseThrow(()-> new RuntimeException("invalid email"));
-		
+
 		if(!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
 			throw new PasswordNotFound("invalid password");
 		}
-		
+
 		return "login successfully";
 	}**/
 
-	 @Override
-	    public UserDetails loadUserByUsername(String email) {
-	        User user = userRepo.findByEmail(email)
-	                .orElseThrow(() -> new RuntimeException("User not found"));
+	@Override
+	public UserDetails loadUserByUsername(String email) {
+		User user = userRepo.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+		return new org.springframework.security.core.userdetails.User(
+				user.getEmail(),
+				user.getPassword(),
+				List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+				);
+	}
 
-						// Ensure the granted authority uses the ROLE_ prefix so hasRole(...) checks work
-						return new org.springframework.security.core.userdetails.User(
-								user.getEmail(),
-								user.getPassword(),
-								List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
-						);
-	    }
-	 
-		@PreAuthorize("hasAuthority('USER_DELETE') or hasRole('ADMIN')")
-		public String deleteUser(long id) {
-			userRepo.deleteById(id);
-			return "delete succefully";
-		 }
-	 
-	 @PreAuthorize("hasAuthority('USER_READ') or hasRole('ADMIN')")
-	 public List<UserResponce> getAllUser() {
-		 List<User> users = userRepo.findAll();
+	// Update user profile
+	@PreAuthorize("hasAuthority('USER_UPDATE') or hasRole('ADMIN')")
+	public UserResponce updateUser(long id, UpdateUserRequest req) {
+		User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+		if (!user.getMobileNum().equals(req.getMobileNum()) && userRepo.existsByMobileNum(req.getMobileNum())) {
+			throw new MobileNumberAllreadyExist("mobile number already exist");
+		}
 
-						return users.stream()
-							.map(user -> new UserResponce(
-									user.getId(),
-									user.getFname(),
-									user.getEmail(),
-									user.getMobileNum(),
-									user.getRole(),
-									user.getLocalDateTime()))
-							.toList();
-	 }
+		user.setFname(req.getFname());
+		user.setMobileNum(req.getMobileNum());
+		userRepo.save(user);
+
+		return new UserResponce(user.getId(), user.getFname(), user.getEmail(), user.getMobileNum(), user.getRole(), user.getLocalDateTime());
+	}
+
+	// Change password using current password
+	public String changePassword(ChangePasswordRequest req) {
+		User user = userRepo.findByEmail(req.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+
+		if (!passwordEncoder.matches(req.getCurrentPassword(), user.getPassword())) {
+			throw new com.example.loginRegistration.exceptionHandling.PasswordNotFound("Current password is incorrect");
+		}
+
+		user.setPassword(passwordEncoder.encode(req.getNewPassword()));
+		userRepo.save(user);
+		return "Password changed successfully";
+	}
+
+	// Request password reset via email OTP
+	public String requestPasswordReset(String email) {
+		User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+		String otp = generateOtp();
+		user.setOtp(otp);
+		user.setOtpExpriresAt(LocalDateTime.now().plusMinutes(10));
+		userRepo.save(user);
+		emailService.sendOtp(user.getEmail(), otp);
+		return "OTP sent to email";
+	}
+
+	// Reset password using OTP sent to email
+	public String resetPasswordWithOtp(ResetPasswordRequest req) {
+		User user = userRepo.findByEmail(req.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+
+		if (req.getOtp() == null || !req.getOtp().equals(user.getOtp())) {
+			throw new RuntimeException("Invalid OTP");
+		}
+
+		if (user.getOtpExpriresAt() == null || user.getOtpExpriresAt().isBefore(LocalDateTime.now())) {
+			throw new RuntimeException("OTP expired");
+		}
+
+		// set new password
+		user.setPassword(passwordEncoder.encode(req.getNewPassword()));
+		user.setOtp(null);
+		user.setOtpExpriresAt(null);
+		userRepo.save(user);
+		return "Password reset successfully";
+	}
+
+	@PreAuthorize("hasAuthority('USER_DELETE') or hasRole('ADMIN')")
+	public String deleteUser(long id) {
+		userRepo.deleteById(id);
+		return "delete succefully";
+	}
+
+	@PreAuthorize("hasAuthority('USER_READ') or hasRole('ADMIN')")
+	public List<UserResponce> getAllUser() {
+		List<User> users = userRepo.findAll();
+
+		return users.stream()
+				.map(user -> new UserResponce(
+						user.getId(),
+						user.getFname(),
+						user.getEmail(),
+						user.getMobileNum(),
+						user.getRole(),
+						user.getLocalDateTime()))
+				.toList();
+	}
 
 }

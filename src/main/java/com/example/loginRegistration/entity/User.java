@@ -31,40 +31,40 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements UserDetails{
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@NotBlank(message = "name is not blank")
 	@Size(min = 5, max = 40, message = "Username must be between 3-40 characters")
 	@Column(nullable = false)
 	private String fname;
-	
+
 	@NotBlank(message = "email is not blank")
 	@Email(message = "email invalid format")
 	@Column(nullable = false, unique = true)
 	private String email;
-	
+
 	@NotBlank(message = "mobile number is not blank")
 	@Column(nullable = false, length = 10)
 	private String mobileNum;
-	
+
 	@NotBlank(message = "password is not blank")
 	//@Size(min = 8, message = "Password must be at least 8 characters")
 	@Column(nullable = false)
 	private String password;
-	
+
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Role role;
-	
+
 	private boolean isOtpVerified = false;
-	
+
 	private String otp;
-	
+
 	private LocalDateTime otpExpriresAt;
-	
+
 	private LocalDateTime localDateTime;
 
 	public Long getId() {
@@ -121,8 +121,8 @@ public class User implements UserDetails{
 	public void setLocalDateTime(LocalDateTime localDateTime) {
 		this.localDateTime = localDateTime;
 	}
-	
-	
+
+
 
 	public boolean isOtpVerified() {
 		return isOtpVerified;
@@ -155,8 +155,8 @@ public class User implements UserDetails{
 		authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
 		if (role.getPermission() != null) {
 			role.getPermission().stream()
-				.map(permission -> new SimpleGrantedAuthority(permission.name()))
-				.forEach(authorities::add);
+			.map(permission -> new SimpleGrantedAuthority(permission.name()))
+			.forEach(authorities::add);
 		}
 		return authorities;
 	}
@@ -165,30 +165,30 @@ public class User implements UserDetails{
 	public String getUsername() {
 		// TODO Auto-generated method stub
 		return this.email;
-	
+
 	}
-	
+
 	@Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+	public boolean isAccountNonExpired() {
+		return true;
+	}
 
-    // Account Lock
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+	// Account Lock
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
 
-    // Password Expiry
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-    
-    // Account Active
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+	// Password Expiry
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	// Account Active
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
 
 }
