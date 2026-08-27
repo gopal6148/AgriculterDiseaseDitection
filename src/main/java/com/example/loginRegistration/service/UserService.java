@@ -73,7 +73,7 @@ public class UserService implements UserDetailsService{
 	public String verifyOtp(OtpRequest req) {
 
 		User user = userRepo.findByEmail(req.getEmail())
-				.orElseThrow(() -> new RuntimeException("User not found"));
+				.orElseThrow(() -> new RuntimeException("Invalid email"));
 
 		if (req.getOtp() == null) {
 			throw new RuntimeException("OTP is required");
@@ -98,7 +98,7 @@ public class UserService implements UserDetailsService{
 
 	public String resendOtp(String email) {
 		User user = userRepo.findByEmail(email)
-				.orElseThrow(() -> new RuntimeException("User not found"));
+				.orElseThrow(() -> new RuntimeException("Invalid email"));
 
 		String otp = generateOtp();
 		user.setOtp(otp);
@@ -132,7 +132,7 @@ public class UserService implements UserDetailsService{
 	@Override
 	public UserDetails loadUserByUsername(String email) {
 		User user = userRepo.findByEmail(email)
-				.orElseThrow(() -> new RuntimeException("User not found"));
+				.orElseThrow(() -> new RuntimeException("Invalid email"));
 		return new org.springframework.security.core.userdetails.User(
 				user.getEmail(),
 				user.getPassword(),
@@ -143,7 +143,7 @@ public class UserService implements UserDetailsService{
 	// Update user profile
 	@PreAuthorize("hasAuthority('USER_UPDATE') or hasRole('ADMIN')")
 	public UserResponce updateUser(long id, UpdateUserRequest req) {
-		User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+		User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("Invalid email"));
 		if (!user.getMobileNum().equals(req.getMobileNum()) && userRepo.existsByMobileNum(req.getMobileNum())) {
 			throw new MobileNumberAllreadyExist("mobile number already exist");
 		}
@@ -157,7 +157,7 @@ public class UserService implements UserDetailsService{
 
 	// Change password using current password
 	public String changePassword(ChangePasswordRequest req) {
-		User user = userRepo.findByEmail(req.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+		User user = userRepo.findByEmail(req.getEmail()).orElseThrow(() -> new RuntimeException("Invalid email"));
 
 		if (!passwordEncoder.matches(req.getCurrentPassword(), user.getPassword())) {
 			throw new com.example.loginRegistration.exceptionHandling.PasswordNotFound("Current password is incorrect");
@@ -170,7 +170,7 @@ public class UserService implements UserDetailsService{
 
 	// Request password reset via email OTP
 	public String requestPasswordReset(String email) {
-		User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+		User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("Invalid email"));
 		String otp = generateOtp();
 		user.setOtp(otp);
 		user.setOtpExpriresAt(LocalDateTime.now().plusMinutes(10));
@@ -181,7 +181,7 @@ public class UserService implements UserDetailsService{
 
 	// Reset password using OTP sent to email
 	public String resetPasswordWithOtp(ResetPasswordRequest req) {
-		User user = userRepo.findByEmail(req.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+		User user = userRepo.findByEmail(req.getEmail()).orElseThrow(() -> new RuntimeException("Invalid email"));
 
 		if (req.getOtp() == null || !req.getOtp().equals(user.getOtp())) {
 			throw new RuntimeException("Invalid OTP");

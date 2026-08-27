@@ -188,7 +188,7 @@ public class User implements UserDetails{
 	// Account Active
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return this.isOtpVerified; // user is enabled only if otp is verified
 	}
 
 }

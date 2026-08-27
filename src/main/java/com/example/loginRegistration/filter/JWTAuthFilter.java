@@ -21,10 +21,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JWTAuthFilter extends OncePerRequestFilter{
-	
+
 	@Autowired
 	private JWTUtil jwtUtil;
-	
+
 	@Autowired
 	private UserService userService;
 
@@ -35,7 +35,7 @@ public class JWTAuthFilter extends OncePerRequestFilter{
 		String token = null;
 		String username = null;
 		if(authHeader != null && authHeader.startsWith("Bearer ")) {
-			 token = authHeader.substring(7);
+			token = authHeader.substring(7);
 			try {
 				username = jwtUtil.extractUsername(token);
 			} catch (IllegalArgumentException | JwtException e) {
@@ -45,7 +45,7 @@ public class JWTAuthFilter extends OncePerRequestFilter{
 				return;
 			}
 		}
-		
+
 		if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			UserDetails userDetails = userService.loadUserByUsername(username);
 			try {
@@ -60,9 +60,9 @@ public class JWTAuthFilter extends OncePerRequestFilter{
 				return;
 			}
 		}
-		
+
 		filterChain.doFilter(request, response);
-		
+
 	}
 
 }

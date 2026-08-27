@@ -80,7 +80,7 @@ public class UserController {
 		}
 	
 	@PostMapping("/login")
-	public String login(@Valid @RequestBody Login login) {
+	public String login(@RequestBody Login login) {
 		authentication.authenticate(
 				new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword())
 				);

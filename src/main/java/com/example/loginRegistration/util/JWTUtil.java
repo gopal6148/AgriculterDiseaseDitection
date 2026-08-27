@@ -27,7 +27,7 @@ public class JWTUtil {
 		// initialize the signing key after secret is injected
 		this.key = Keys.hmacShaKeyFor(secret.getBytes());
 	}
-	
+
 	public String genretedToken(String username) {
 		return Jwts.builder()
 				.setSubject(username)
@@ -35,26 +35,26 @@ public class JWTUtil {
 				.setExpiration(new Date(System.currentTimeMillis() + ExpirationTime))
 				.signWith(key, SignatureAlgorithm.HS256)
 				.compact();
-				
+
 	}
-	
+
 	public String extractUsername(String token) {
 		return extractClaims(token).getSubject();
 	}
-	
+
 	private Claims extractClaims(String token)	{
-	 return Jwts.parserBuilder()
-		.setSigningKey(key)
-		.build()
-		.parseClaimsJws(token)
-		.getBody();
-		
+		return Jwts.parserBuilder()
+				.setSigningKey(key)
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
+
 	}
-	
+
 	public boolean validateToken(String username, UserDetails userDetails, String token) {
 		return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
 	}
-	
+
 	private boolean isTokenExpired(String token) {
 		return extractClaims(token).getExpiration().before(new Date());
 	}
